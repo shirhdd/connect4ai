@@ -1,11 +1,12 @@
 import numpy as np
 
-DEFAULT_BOARD_ROWS = 6
-DEFAULT_BOARD_COLUMNS = 7
+ROWS = 6
+COLUMNS = 7
+PLAYER_ONE = 1
+PLAYER_TWO = 2
 
 class Connect4GameState:
-    def __init__(self, rows=DEFAULT_BOARD_ROWS, columns=DEFAULT_BOARD_COLUMNS, board=None, done=False):
-        super(Connect4GameState, self).__init__()
+    def __init__(self, rows=ROWS, columns=COLUMNS, board=None, done=False):
         self._done = done
         if board is None:
             board = np.zeros((rows, columns), dtype=np.int32)
@@ -20,24 +21,19 @@ class Connect4GameState:
     def board(self):
         return self._board
 
-    def get_legal_actions(self):
-        return [col for col in range(self._num_of_columns) if self._board[0, col] == 0]
-
-    def apply_action(self, col, piece):
-        if not self.is_valid_location(col):
-            raise Exception("Illegal action.")
-        row = self.get_next_open_row(col)
-        self._board[row, col] = piece
-        if self.winning_move(piece):
-            self._done = True
+    def drop_piece(self, row, col, piece):
+        self._board[row][col] = piece
 
     def is_valid_location(self, col):
-        return self._board[0, col] == 0
+        return self._board[self._num_of_rows-1][col] == 0
 
     def get_next_open_row(self, col):
-        for r in range(0, self._num_of_rows-1, 1):
-            if self._board[r, col] == 0:
+        for r in range(self._num_of_rows):
+            if self._board[r][col] == 0:
                 return r
+
+    def print_board(self):
+        print(np.flip(self._board, 0))
 
     def winning_move(self, piece):
         # Check horizontal locations for win
@@ -67,7 +63,10 @@ class Connect4GameState:
         return False
 
     def generate_successor(self, col, agent_index):
-        successor = Connect4GameState(rows=self._num_of_rows, columns=self._num_of_columns, board=self._board.copy(), done=self._done)
+        successor = Connect4GameState(rows=self._num_of_rows,
+                                      columns=self._num_of_columns,
+                                      board=self._board.copy(),
+                                      done=self._done)
         if col is not None:
-            successor.apply_action(col, agent_index+1)
+            successor.apply_action(col, agent_index + 1)
         return successor

@@ -1,13 +1,8 @@
-import argparse
-import numpy as np
-import sys
 import pygame
 import math
-from connect4_game_state import Connect4GameState
-
-# Constants
-DEFAULT_BOARD_ROWS = 6
-DEFAULT_BOARD_COLUMNS = 7
+import sys
+from game_state import Connect4GameState, PLAYER_ONE, PLAYER_TWO, \
+    ROWS, COLUMNS
 
 # Pygame Constants
 SQUARESIZE = 100
@@ -20,26 +15,44 @@ YELLOW = (255, 255, 0)
 
 class Connect4GameRunner:
     def __init__(self):
-        super(Connect4GameRunner, self).__init__()
-        self.current_game = None
         pygame.init()
-        self.width = DEFAULT_BOARD_COLUMNS * SQUARESIZE
-        self.height = (DEFAULT_BOARD_ROWS + 1) * SQUARESIZE
+        self.width = COLUMNS * SQUARESIZE
+        self.height = (ROWS + 1) * SQUARESIZE
         self.size = (self.width, self.height)
         self.screen = pygame.display.set_mode(self.size)
         self.myfont = pygame.font.SysFont("monospace", 75)
+        self.current_game = Connect4GameState()
 
-    def new_game(self, initial_state=None):
-        if initial_state is None:
-            initial_state = Connect4GameState()
-        self.current_game = initial_state
-        self.run_game()
+    def draw_board(self):
+        board = self.current_game.board
+        for c in range(COLUMNS):
+            for r in range(ROWS):
+                pygame.draw.rect(self.screen, BLUE, (
+                c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE,
+                SQUARESIZE))
+                pygame.draw.circle(self.screen, BLACK, (
+                int(c * SQUARESIZE + SQUARESIZE / 2),
+                int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+
+        for c in range(COLUMNS):
+            for r in range(ROWS):
+                if board[r][c] == PLAYER_ONE:
+                    pygame.draw.circle(self.screen, RED, (
+                    int(c * SQUARESIZE + SQUARESIZE / 2),
+                    int(self.height - (r * SQUARESIZE + SQUARESIZE / 2))),
+                                       RADIUS)
+                elif board[r][c] == PLAYER_TWO:
+                    pygame.draw.circle(self.screen, YELLOW, (
+                    int(c * SQUARESIZE + SQUARESIZE / 2),
+                    int(self.height - (r * SQUARESIZE + SQUARESIZE / 2))),
+                                       RADIUS)
+        pygame.display.update()
 
     def run_game(self):
         game_over = False
         turn = 0
 
-        self.draw_board(self.current_game.board)
+        self.draw_board()
         pygame.display.update()
 
         while not game_over:
@@ -66,15 +79,21 @@ class Connect4GameRunner:
                     col = int(math.floor(posx / SQUARESIZE))
 
                     if self.current_game.is_valid_location(col):
-                        self.current_game.apply_action(col,
-                                                       1 if turn == 0 else 2)
-                        self.draw_board(self.current_game.board)
+                        row = self.current_game.get_next_open_row(col)
+                        self.current_game.drop_piece(row, col,
+                                                     PLAYER_ONE if turn == 0 else PLAYER_TWO)
+                        self.draw_board()
+                        self.current_game.print_board()  # Print the board in the terminal
 
-                        if self.current_game.done:
+                        if self.current_game.winning_move(
+                                PLAYER_ONE if turn == 0 else PLAYER_TWO):
                             label = self.myfont.render(
                                 f"Player {turn + 1} wins!!", 1,
                                 RED if turn == 0 else YELLOW)
                             self.screen.blit(label, (40, 10))
+                            pygame.display.update()  # Update the display to show the win message
+                            print(
+                                f"Player {turn + 1} wins!")  # Print the win message in the terminal
                             game_over = True
 
                         turn += 1
@@ -83,42 +102,10 @@ class Connect4GameRunner:
                         if game_over:
                             pygame.time.wait(3000)
 
-    def draw_board(self, board):
-        for c in range(DEFAULT_BOARD_COLUMNS):
-            for r in range(DEFAULT_BOARD_ROWS):
-                pygame.draw.rect(self.screen, BLUE, (
-                c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE,
-                SQUARESIZE))
-                pygame.draw.circle(self.screen, BLACK, (
-                int(c * SQUARESIZE + SQUARESIZE / 2),
-                int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
-
-        for c in range(DEFAULT_BOARD_COLUMNS):
-            for r in range(DEFAULT_BOARD_ROWS):
-                if board[r][c] == 1:
-                    pygame.draw.circle(self.screen, RED, (
-                    int(c * SQUARESIZE + SQUARESIZE / 2), int((
-                                                                          DEFAULT_BOARD_ROWS - r - 1) * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)),
-                                       RADIUS)
-                elif board[r][c] == 2:
-                    pygame.draw.circle(self.screen, YELLOW, (
-                    int(c * SQUARESIZE + SQUARESIZE / 2), int((
-                                                                          DEFAULT_BOARD_ROWS - r - 1) * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)),
-                                       RADIUS)
-        pygame.display.update()
-
 
 def main():
-    parser = argparse.ArgumentParser(description='Connect 4 game.')
-    parser.add_argument('--rows', help='Number of rows for the board.',
-                        default=DEFAULT_BOARD_ROWS, type=int)
-    parser.add_argument('--columns', help='Number of columns for the board.',
-                        default=DEFAULT_BOARD_COLUMNS, type=int)
-    args = parser.parse_args()
-
-    initial_state = Connect4GameState(rows=args.rows, columns=args.columns)
     game_runner = Connect4GameRunner()
-    game_runner.new_game(initial_state=initial_state)
+    game_runner.run_game()
 
 
 if __name__ == '__main__':
