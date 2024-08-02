@@ -35,7 +35,7 @@ class Connect4GameState:
         return self._board[0, col] == 0
 
     def get_next_open_row(self, col):
-        for r in range(self._num_of_rows-1, -1, -1):
+        for r in range(0, self._num_of_rows-1, 1):
             if self._board[r, col] == 0:
                 return r
 
