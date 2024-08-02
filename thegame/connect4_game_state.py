@@ -66,13 +66,8 @@ class Connect4GameState:
 
         return False
 
-    def generate_successor(self, agent_index=0, action=None):
+    def generate_successor(self, col, agent_index):
         successor = Connect4GameState(rows=self._num_of_rows, columns=self._num_of_columns, board=self._board.copy(), done=self._done)
-        if action is not None:
-            if agent_index == 0:
-                successor.apply_action(action[1], action[0])
-            elif agent_index == 1:
-                successor.apply_action(action[1], action[0])
-            else:
-                raise Exception("Illegal agent index.")
+        if col is not None:
+            successor.apply_action(col, agent_index+1)
         return successor
