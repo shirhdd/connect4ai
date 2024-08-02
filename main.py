@@ -42,6 +42,7 @@ def get_next_open_row(board, col):
     for r in range(ROWS):
         if board[r][col] == 0:
             return r
+    return None
 
 
 def print_board(board):
@@ -84,22 +85,22 @@ def draw_board(board):
     for c in range(COLUMNS):
         for r in range(ROWS):
             pygame.draw.rect(screen, BLUE, (
-            c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE,
-            SQUARESIZE))
+                c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE,
+                SQUARESIZE))
             pygame.draw.circle(screen, BLACK, (
-            int(c * SQUARESIZE + SQUARESIZE / 2),
-            int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+                int(c * SQUARESIZE + SQUARESIZE / 2),
+                int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
 
     for c in range(COLUMNS):
         for r in range(ROWS):
             if board[r][c] == 1:
                 pygame.draw.circle(screen, RED, (
-                int(c * SQUARESIZE + SQUARESIZE / 2),
-                HEIGHT - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+                    int(c * SQUARESIZE + SQUARESIZE / 2),
+                    HEIGHT - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
             elif board[r][c] == 2:
                 pygame.draw.circle(screen, YELLOW, (
-                int(c * SQUARESIZE + SQUARESIZE / 2),
-                HEIGHT - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+                    int(c * SQUARESIZE + SQUARESIZE / 2),
+                    HEIGHT - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
     pygame.display.update()
 
 
@@ -128,14 +129,15 @@ def play_game():
             pygame.display.update()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
+
                 pygame.draw.rect(screen, BLACK, (0, 0, WIDTH, SQUARESIZE))
                 # Ask for Player 1 Input
                 if turn == 0:
                     posx = event.pos[0]
                     col = int(math.floor(posx / SQUARESIZE))
 
-                    if is_valid_location(board, col):
-                        row = get_next_open_row(board, col)
+                    row = get_next_open_row(board, col)
+                    if is_valid_location(board, col) and row is not None:
                         drop_piece(board, row, col, 1)
 
                         if winning_move(board, 1):
@@ -148,8 +150,8 @@ def play_game():
                     posx = event.pos[0]
                     col = int(math.floor(posx / SQUARESIZE))
 
-                    if is_valid_location(board, col):
-                        row = get_next_open_row(board, col)
+                    row = get_next_open_row(board, col)
+                    if is_valid_location(board, col) and row is not None:
                         drop_piece(board, row, col, 2)
 
                         if winning_move(board, 2):
