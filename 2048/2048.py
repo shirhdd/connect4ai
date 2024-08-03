@@ -45,7 +45,7 @@ class GameRunner(object):
 
 def create_agent(args):
     if args.agent == 'ReflexAgent':
-        from multi_agents import ReflexAgent
+        from thegame.multi_agents import ReflexAgent
         agent = ReflexAgent()
     else:
         agent = util.lookup('multi_agents.' + args.agent, globals())(depth=args.depth,
