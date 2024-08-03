@@ -21,8 +21,8 @@ class Display:
         self.screen = pygame.display.set_mode(self.size)
         pygame.init()
         self.myfont = pygame.font.SysFont("monospace", 75)
-        self.red_piece = pygame.image.load(RED_IMG)
-        self.yellow_piece = pygame.image.load(YELLOW_IMG)
+        self.red_piece = pygame.image.load("./images/red_70x70.png")
+        self.yellow_piece = pygame.image.load("./images/yellow_70x70.png")
         self.red_piece = pygame.transform.scale(self.red_piece,
                                                 (SQUARESIZE, SQUARESIZE))
         self.yellow_piece = pygame.transform.scale(self.yellow_piece,
@@ -62,6 +62,11 @@ class Display:
         label = self.myfont.render(f"Player {turn + 1} wins!!", 1,
                                    RED if turn == 0 else YELLOW)
         self.screen.blit(label, (40, 10))
+
+    def write_draw(self):
+        label = self.myfont.render(f"its a draw...", 1, BLACK)
+        self.screen.blit(label, (40, 10))
+
 
     def update_screen(self):
         pygame.display.update()

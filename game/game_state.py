@@ -79,7 +79,6 @@ class Connect4GameState:
                                       done=self._done)
         if col is not None:
             row = self.get_next_open_row(col)
-            # print("move", row, col)
             successor.drop_piece(row, col, 1 if agent_index == 0 else 2)
         return successor
 
@@ -173,24 +172,24 @@ class Connect4GameState:
         for c in range(self._num_of_columns-3):
             for r in range(self._num_of_rows):
                 if self._board[r][c] in [piece, 0] and self._board[r][c+1] in [piece, 0] and self._board[r][c+2] in [piece, 0] and self._board[r][c+3] in [piece, 0]:
-                    score += sum(self._board[r][c: c + 4]) / piece
+                    score += sum([self._board[r][c], self._board[r][c+1], self._board[r][c+2], self._board[r][c+3]]) // piece
 
         # Check vertical locations for win
         for c in range(self._num_of_columns):
             for r in range(self._num_of_rows-3):
-
                 if self._board[r][c] in [piece, 0] and self._board[r+1][c] in [piece, 0]  and self._board[r+2][c] in [piece, 0]  and self._board[r+3][c] in [piece, 0]:
-                    score += sum(self._board[r: r + 4][c]) / piece
+                    score += sum([self._board[r][c], self._board[r+1][c], self._board[r+2][c], self._board[r+3][c]]) // piece
 
         # Check positively sloped diagonals
         for c in range(self._num_of_columns-3):
             for r in range(self._num_of_rows-3):
                 if self._board[r][c] in [piece, 0] and self._board[r+1][c+1] in [piece, 0] and self._board[r+2][c+2] in [piece, 0] and self._board[r+3][c+3] in [piece, 0]:
-                    score += sum(self._board[r: r + 4][c: c + 4]) / piece
+                    score += sum([self._board[r][c], self._board[r+1][c+1], self._board[r+2][c+2], self._board[r+3][c+3]]) // piece
 
         # Check negatively sloped diagonals
         for c in range(self._num_of_columns-3):
             for r in range(3, self._num_of_rows):
                 if self._board[r][c] in [piece, 0] and self._board[r-1][c+1] in [piece, 0] and self._board[r-2][c+2] in [piece, 0] and self._board[r-3][c+3] in [piece, 0]:
-                    score += sum(self._board[r - 3: r + 1][c: c + 4]) / piece
+                    score += sum([self._board[r][c], self._board[r-1][c+1], self._board[r-2][c+2], self._board[r-3][c+3]]) // piece
 
+        return score

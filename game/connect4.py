@@ -29,7 +29,7 @@ class Connect4GameRunner:
                 if event.type == pygame.QUIT:
                     sys.exit()
                 action = -1
-                if turn == 0:
+                if turn == 1:
                     action = agent.get_action(self.current_game)
                 else:
                     # Mouse hover
@@ -40,6 +40,7 @@ class Connect4GameRunner:
 
                     # Mouse click
                     if event.type == pygame.MOUSEBUTTONDOWN:
+                        print("score: ", self.current_game.get_all_four(1) - self.current_game.get_all_four(2))
                         posx = event.pos[0]
                         action = int(math.floor(posx / SQUARESIZE))
 
@@ -60,6 +61,12 @@ class Connect4GameRunner:
                         display.update_screen()  # Update the display to show the win message
                         print(
                             f"Player {turn + 1} wins!")  # Print the win message in the terminal
+                        game_over = True
+                    if self.current_game.get_legal_actions() == []:
+                        display.write_draw()
+                        display.update_screen()  # Update the display to show the win message
+                        print(
+                            f"its a draw!")  # Print the win message in the terminal
                         game_over = True
 
                     turn += 1
