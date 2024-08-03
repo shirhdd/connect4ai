@@ -83,18 +83,43 @@ class Connect4GameState:
             successor.drop_piece(row, col, 1 if agent_index == 0 else 2)
         return successor
 
+    def potential_row(self, player, first):
+        potenial = 0
+        for i in range(first[1], self._num_of_columns):
+            if self._board[first[0]][i] != 0 and self._board[first[0]][i] != player:
+                break
+            potenial += 1
+        for i in range(first[1] - 1, 0, -1):
+            if self._board[first[0]][i] != 0 and self._board[first[0]][i] != player:
+                break
+            potenial += 1
+        return potenial >= 4
+
+    def potential_cols(self, player, first):
+        potenial = 0
+        for i in range(first[0], self._num_of_rows):
+            if self._board[i][first[1]] != 0 and self._board[i][first[1]] != player:
+                break
+            potenial += 1
+        return potenial >= 4
+
     def find_largest_streak(self, player):
         max_streak = 0
+        first = (-1, -1)
+        last = -1
 
         # Check rows for streaks
         for r in range(self._num_of_rows):
             streak = 0
             for c in range(self._num_of_columns):
                 if self._board[r][c] == player:
+                    if streak == 0:
+                        first = (r, c)
                     streak += 1
-                    if streak > max_streak:
-                        max_streak = streak
                 else:
+                    if self.potential_row(player, first) and streak > max_streak:
+                        max_streak = streak
+
                     streak = 0
 
         # Check columns for streaks
@@ -102,10 +127,13 @@ class Connect4GameState:
             streak = 0
             for r in range(self._num_of_rows):
                 if self._board[r][c] == player:
+                    if streak == 0:
+                        first = (r, c)
                     streak += 1
-                    if streak > max_streak:
-                        max_streak = streak
+
                 else:
+                    if self.potential_cols(player, first) and streak > max_streak:
+                        max_streak = streak
                     streak = 0
 
         # Check positively sloped diagonals for streaks
@@ -133,4 +161,35 @@ class Connect4GameState:
                         streak = 0
 
         return max_streak
+
+
+
+
+
+    def get_all_four(self, piece):
+        score = 0
+
+        # Check horizontal locations for win
+        for c in range(self._num_of_columns-3):
+            for r in range(self._num_of_rows):
+                if self._board[r][c] in [piece, 0] and self._board[r][c+1] in [piece, 0] and self._board[r][c+2] in [piece, 0] and self._board[r][c+3] in [piece, 0]:
+                    score += sum(self._board[r][c: c + 4]) / piece
+
+        # Check vertical locations for win
+        for c in range(self._num_of_columns):
+            for r in range(self._num_of_rows-3):
+                if self._board[r][c] in [piece, 0] and self._board[r+1][c] in [piece, 0]  and self._board[r+2][c] in [piece, 0]  and self._board[r+3][c] in [piece, 0]:
+                    score += sum(self._board[r: r + 4][c]) / piece
+
+        # Check positively sloped diagonals
+        for c in range(self._num_of_columns-3):
+            for r in range(self._num_of_rows-3):
+                if self._board[r][c] in [piece, 0] and self._board[r+1][c+1] in [piece, 0] and self._board[r+2][c+2] in [piece, 0] and self._board[r+3][c+3] in [piece, 0]:
+                    score += sum(self._board[r: r + 4][c: c + 4]) / piece
+
+        # Check negatively sloped diagonals
+        for c in range(self._num_of_columns-3):
+            for r in range(3, self._num_of_rows):
+                if self._board[r][c] in [piece, 0] and self._board[r-1][c+1] in [piece, 0] and self._board[r-2][c+2] in [piece, 0] and self._board[r-3][c+3] in [piece, 0]:
+                    score += sum(self._board[r - 3: r + 1][c: c + 4]) / piece
 
