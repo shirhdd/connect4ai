@@ -2,7 +2,7 @@ import math
 import sys
 from display import Display, SQUARESIZE
 import pygame
-from multi_agents import AlphaBetaAgent
+from multi_agents import AlphaBetaAgent,MonteCarloAgent
 from game_state import Connect4GameState, PLAYER_ONE, PLAYER_TWO, \
     ROWS, COLUMNS
 
@@ -13,7 +13,7 @@ class Connect4GameRunner:
     def run_game(self):
         game_over = False
         turn = 0
-        agent = AlphaBetaAgent()
+        agent = MonteCarloAgent()
         display = Display()
         display.draw_board(self.current_game.board)
 

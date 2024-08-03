@@ -31,11 +31,11 @@ class Connect4GameState:
         for col in range(self._num_of_columns):
             if self.is_valid_location(col):
                 legal_action += [col]
-        print(legal_action)
+        # print(legal_action)
         return legal_action
 
     def is_valid_location(self, col):
-        print("bord", col,self._board[self._num_of_rows-1][col])
+        # print("bord", col,self._board[self._num_of_rows-1][col])
         return self._board[self._num_of_rows-1][col] == 0
 
     def get_next_open_row(self, col):
@@ -79,6 +79,6 @@ class Connect4GameState:
                                       done=self._done)
         if col is not None:
             row = self.get_next_open_row(col)
-            print("move", row, col)
-            successor.drop_piece(row, col, agent_index)
+            # print("move", row, col)
+            successor.drop_piece(row, col, 1 if agent_index == 0 else 2)
         return successor
