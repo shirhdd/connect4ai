@@ -82,3 +82,55 @@ class Connect4GameState:
             # print("move", row, col)
             successor.drop_piece(row, col, 1 if agent_index == 0 else 2)
         return successor
+
+    def find_largest_streak(self, player):
+        max_streak = 0
+
+        # Check rows for streaks
+        for r in range(self._num_of_rows):
+            streak = 0
+            for c in range(self._num_of_columns):
+                if self._board[r][c] == player:
+                    streak += 1
+                    if streak > max_streak:
+                        max_streak = streak
+                else:
+                    streak = 0
+
+        # Check columns for streaks
+        for c in range(self._num_of_columns):
+            streak = 0
+            for r in range(self._num_of_rows):
+                if self._board[r][c] == player:
+                    streak += 1
+                    if streak > max_streak:
+                        max_streak = streak
+                else:
+                    streak = 0
+
+        # Check positively sloped diagonals for streaks
+        for r in range(self._num_of_rows - 3):
+            for c in range(self._num_of_columns - 3):
+                streak = 0
+                for i in range(min(self._num_of_rows - r, self._num_of_columns - c)):
+                    if self._board[r + i][c + i] == player:
+                        streak += 1
+                        if streak > max_streak:
+                            max_streak = streak
+                    else:
+                        streak = 0
+
+        # Check negatively sloped diagonals for streaks
+        for r in range(3, self._num_of_rows):
+            for c in range(self._num_of_columns - 3):
+                streak = 0
+                for i in range(min(r + 1, self._num_of_columns - c)):
+                    if self._board[r - i][c + i] == 1:
+                        streak += 1
+                        if streak > max_streak:
+                            max_streak = streak
+                    else:
+                        streak = 0
+
+        return max_streak
+

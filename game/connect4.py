@@ -13,7 +13,7 @@ class Connect4GameRunner:
     def run_game(self):
         game_over = False
         turn = 0
-        agent = MonteCarloAgent()
+        agent = AlphaBetaAgent()
         display = Display()
         display.draw_board(self.current_game.board)
 
