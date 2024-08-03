@@ -24,6 +24,13 @@ class Connect4GameState:
     def drop_piece(self, row, col, piece):
         self._board[row][col] = piece
 
+    def get_legal_actions(self):
+        legal_action = []
+        for col in range(self._num_of_columns):
+            if self.is_valid_location(col):
+                legal_action += [col]
+        return legal_action
+
     def is_valid_location(self, col):
         return self._board[self._num_of_rows-1][col] == 0
 
@@ -68,5 +75,6 @@ class Connect4GameState:
                                       board=self._board.copy(),
                                       done=self._done)
         if col is not None:
-            successor.apply_action(col, agent_index + 1)
+            row = self.get_next_open_row(col)
+            successor.drop_piece(row, col, agent_index)
         return successor
