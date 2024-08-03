@@ -23,6 +23,8 @@ class Connect4GameState:
 
     def drop_piece(self, row, col, piece):
         self._board[row][col] = piece
+        self._done = self.winning_move(piece)
+
 
     def get_legal_actions(self):
         legal_action = []
@@ -68,7 +70,6 @@ class Connect4GameState:
             for r in range(3, self._num_of_rows):
                 if self._board[r][c] == piece and self._board[r-1][c+1] == piece and self._board[r-2][c+2] == piece and self._board[r-3][c+3] == piece:
                     return True
-
         return False
 
     def generate_successor(self, col, agent_index):
