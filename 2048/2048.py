@@ -1,8 +1,7 @@
 import argparse
 import numpy
 import os
-import util
-from game import Game, RandomOpponentAgent
+from game import Game, RandomOpponentAgent, util
 from game_state import GameState
 from graphics_display import GabrieleCirulli2048GraphicsDisplay
 from keyboard_agent import KeyboardAgent
