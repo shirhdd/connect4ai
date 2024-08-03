@@ -28,7 +28,7 @@ class Connect4GameRunner:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
-                action = -1
+                action = -2
                 if turn == 1:
                     action = agent.get_action(self.current_game)
                 else:
@@ -45,7 +45,7 @@ class Connect4GameRunner:
                         action = int(math.floor(posx / SQUARESIZE))
 
                 # Verify action is valid
-                if action != -1 and self.current_game.is_valid_location(
+                if action != -2 and self.current_game.is_valid_location(
                         action):
                     display.draw_rect()
                     row = self.current_game.get_next_open_row(action)

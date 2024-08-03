@@ -172,24 +172,31 @@ class Connect4GameState:
         for c in range(self._num_of_columns-3):
             for r in range(self._num_of_rows):
                 if self._board[r][c] in [piece, 0] and self._board[r][c+1] in [piece, 0] and self._board[r][c+2] in [piece, 0] and self._board[r][c+3] in [piece, 0]:
-                    score += sum([self._board[r][c], self._board[r][c+1], self._board[r][c+2], self._board[r][c+3]]) // piece
+                    temp = sum([self._board[r][c], self._board[r][c+1], self._board[r][c+2], self._board[r][c+3]]) // piece
+                    score += temp if temp < 4 else 200
+
 
         # Check vertical locations for win
         for c in range(self._num_of_columns):
             for r in range(self._num_of_rows-3):
                 if self._board[r][c] in [piece, 0] and self._board[r+1][c] in [piece, 0]  and self._board[r+2][c] in [piece, 0]  and self._board[r+3][c] in [piece, 0]:
-                    score += sum([self._board[r][c], self._board[r+1][c], self._board[r+2][c], self._board[r+3][c]]) // piece
+                    temp = sum([self._board[r][c], self._board[r+1][c], self._board[r+2][c], self._board[r+3][c]]) // piece
+                    score += temp if temp < 4 else 200
+
 
         # Check positively sloped diagonals
         for c in range(self._num_of_columns-3):
             for r in range(self._num_of_rows-3):
                 if self._board[r][c] in [piece, 0] and self._board[r+1][c+1] in [piece, 0] and self._board[r+2][c+2] in [piece, 0] and self._board[r+3][c+3] in [piece, 0]:
-                    score += sum([self._board[r][c], self._board[r+1][c+1], self._board[r+2][c+2], self._board[r+3][c+3]]) // piece
+                    temp = sum([self._board[r][c], self._board[r+1][c+1], self._board[r+2][c+2], self._board[r+3][c+3]]) // piece
+                    score += temp if temp < 4 else 200
+
 
         # Check negatively sloped diagonals
         for c in range(self._num_of_columns-3):
             for r in range(3, self._num_of_rows):
                 if self._board[r][c] in [piece, 0] and self._board[r-1][c+1] in [piece, 0] and self._board[r-2][c+2] in [piece, 0] and self._board[r-3][c+3] in [piece, 0]:
-                    score += sum([self._board[r][c], self._board[r-1][c+1], self._board[r-2][c+2], self._board[r-3][c+3]]) // piece
+                    temp = sum([self._board[r][c], self._board[r-1][c+1], self._board[r-2][c+2], self._board[r-3][c+3]]) // piece
+                    score += temp if temp < 4 else 200
 
         return score
