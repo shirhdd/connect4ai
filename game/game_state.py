@@ -178,6 +178,7 @@ class Connect4GameState:
         # Check vertical locations for win
         for c in range(self._num_of_columns):
             for r in range(self._num_of_rows-3):
+
                 if self._board[r][c] in [piece, 0] and self._board[r+1][c] in [piece, 0]  and self._board[r+2][c] in [piece, 0]  and self._board[r+3][c] in [piece, 0]:
                     score += sum(self._board[r: r + 4][c]) / piece
 
