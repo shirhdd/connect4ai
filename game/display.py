@@ -67,6 +67,5 @@ class Display:
         label = self.myfont.render(f"its a draw...", 1, BLACK)
         self.screen.blit(label, (40, 10))
 
-
     def update_screen(self):
         pygame.display.update()

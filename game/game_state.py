@@ -5,6 +5,7 @@ COLUMNS = 7
 PLAYER_ONE = 1
 PLAYER_TWO = 2
 
+
 class Connect4GameState:
     def __init__(self, rows=ROWS, columns=COLUMNS, board=None, done=False):
         self._done = done
@@ -12,6 +13,10 @@ class Connect4GameState:
             board = np.zeros((rows, columns), dtype=np.int32)
         self._board = board
         self._num_of_rows, self._num_of_columns = rows, columns
+        self._directions = [(0, 1),  # Horizontal
+                            (1, 0),  # Vertical
+                            (1, 1),  # Positive diagonal
+                            (-1, 1)]  # Negative diagonal
 
     @property
     def done(self):
@@ -25,7 +30,6 @@ class Connect4GameState:
         self._board[row][col] = piece
         self._done = self.winning_move(piece)
 
-
     def get_legal_actions(self):
         legal_action = []
         for col in range(self._num_of_columns):
@@ -36,7 +40,7 @@ class Connect4GameState:
 
     def is_valid_location(self, col):
         # print("bord", col,self._board[self._num_of_rows-1][col])
-        return self._board[self._num_of_rows-1][col] == 0
+        return self._board[self._num_of_rows - 1][col] == 0
 
     def get_next_open_row(self, col):
         for r in range(self._num_of_rows):
@@ -45,32 +49,6 @@ class Connect4GameState:
 
     def print_board(self):
         print(np.flip(self._board, 0))
-
-    def winning_move(self, piece):
-        # Check horizontal locations for win
-        for c in range(self._num_of_columns-3):
-            for r in range(self._num_of_rows):
-                if self._board[r][c] == piece and self._board[r][c+1] == piece and self._board[r][c+2] == piece and self._board[r][c+3] == piece:
-                    return True
-
-        # Check vertical locations for win
-        for c in range(self._num_of_columns):
-            for r in range(self._num_of_rows-3):
-                if self._board[r][c] == piece and self._board[r+1][c] == piece and self._board[r+2][c] == piece and self._board[r+3][c] == piece:
-                    return True
-
-        # Check positively sloped diagonals
-        for c in range(self._num_of_columns-3):
-            for r in range(self._num_of_rows-3):
-                if self._board[r][c] == piece and self._board[r+1][c+1] == piece and self._board[r+2][c+2] == piece and self._board[r+3][c+3] == piece:
-                    return True
-
-        # Check negatively sloped diagonals
-        for c in range(self._num_of_columns-3):
-            for r in range(3, self._num_of_rows):
-                if self._board[r][c] == piece and self._board[r-1][c+1] == piece and self._board[r-2][c+2] == piece and self._board[r-3][c+3] == piece:
-                    return True
-        return False
 
     def generate_successor(self, col, agent_index):
         successor = Connect4GameState(rows=self._num_of_rows,
@@ -102,101 +80,55 @@ class Connect4GameState:
             potenial += 1
         return potenial >= 4
 
-    def find_largest_streak(self, player):
-        max_streak = 0
-        first = (-1, -1)
-        last = -1
 
-        # Check rows for streaks
+    def winning_move(self, piece):
+        def check_line(line):
+            return all(cell == piece for cell in line)
+
+        def is_valid_cell(r, c):
+            return 0 <= r < self._num_of_rows and 0 <= c < self._num_of_columns
+
+        def check_direction(r, c, dr, dc):
+            line = []
+            for i in range(4):
+                nr, nc = r + dr * i, c + dc * i
+                if is_valid_cell(nr, nc):
+                    line.append(self._board[nr][nc])
+                else:
+                    return False
+            return check_line(line)
+
         for r in range(self._num_of_rows):
-            streak = 0
             for c in range(self._num_of_columns):
-                if self._board[r][c] == player:
-                    if streak == 0:
-                        first = (r, c)
-                    streak += 1
-                else:
-                    if self.potential_row(player, first) and streak > max_streak:
-                        max_streak = streak
+                for dr, dc in self._directions:
+                    if check_direction(r, c, dr, dc):
+                        return True
 
-                    streak = 0
-
-        # Check columns for streaks
-        for c in range(self._num_of_columns):
-            streak = 0
-            for r in range(self._num_of_rows):
-                if self._board[r][c] == player:
-                    if streak == 0:
-                        first = (r, c)
-                    streak += 1
-
-                else:
-                    if self.potential_cols(player, first) and streak > max_streak:
-                        max_streak = streak
-                    streak = 0
-
-        # Check positively sloped diagonals for streaks
-        for r in range(self._num_of_rows - 3):
-            for c in range(self._num_of_columns - 3):
-                streak = 0
-                for i in range(min(self._num_of_rows - r, self._num_of_columns - c)):
-                    if self._board[r + i][c + i] == player:
-                        streak += 1
-                        if streak > max_streak:
-                            max_streak = streak
-                    else:
-                        streak = 0
-
-        # Check negatively sloped diagonals for streaks
-        for r in range(3, self._num_of_rows):
-            for c in range(self._num_of_columns - 3):
-                streak = 0
-                for i in range(min(r + 1, self._num_of_columns - c)):
-                    if self._board[r - i][c + i] == 1:
-                        streak += 1
-                        if streak > max_streak:
-                            max_streak = streak
-                    else:
-                        streak = 0
-
-        return max_streak
-
-
-
-
+        return False
 
     def get_all_four(self, piece):
+        def check_line(line):
+            temp = sum(line) // piece
+            return temp if temp < 4 else 200
+
+        def is_valid_cell(r, c):
+            return 0 <= r < self._num_of_rows and 0 <= c < self._num_of_columns and self._board[r][c] in [piece, 0]
+
+        def check_direction(r, c, dr, dc):
+            line = []
+            for i in range(4):
+                nr, nc = r + dr * i, c + dc * i
+                if is_valid_cell(nr, nc):
+                    line.append(self._board[nr][nc])
+                else:
+                    return 0
+            return check_line(line)
+
         score = 0
 
-        # Check horizontal locations for win
-        for c in range(self._num_of_columns-3):
-            for r in range(self._num_of_rows):
-                if self._board[r][c] in [piece, 0] and self._board[r][c+1] in [piece, 0] and self._board[r][c+2] in [piece, 0] and self._board[r][c+3] in [piece, 0]:
-                    temp = sum([self._board[r][c], self._board[r][c+1], self._board[r][c+2], self._board[r][c+3]]) // piece
-                    score += temp if temp < 4 else 200
-
-
-        # Check vertical locations for win
-        for c in range(self._num_of_columns):
-            for r in range(self._num_of_rows-3):
-                if self._board[r][c] in [piece, 0] and self._board[r+1][c] in [piece, 0]  and self._board[r+2][c] in [piece, 0]  and self._board[r+3][c] in [piece, 0]:
-                    temp = sum([self._board[r][c], self._board[r+1][c], self._board[r+2][c], self._board[r+3][c]]) // piece
-                    score += temp if temp < 4 else 200
-
-
-        # Check positively sloped diagonals
-        for c in range(self._num_of_columns-3):
-            for r in range(self._num_of_rows-3):
-                if self._board[r][c] in [piece, 0] and self._board[r+1][c+1] in [piece, 0] and self._board[r+2][c+2] in [piece, 0] and self._board[r+3][c+3] in [piece, 0]:
-                    temp = sum([self._board[r][c], self._board[r+1][c+1], self._board[r+2][c+2], self._board[r+3][c+3]]) // piece
-                    score += temp if temp < 4 else 200
-
-
-        # Check negatively sloped diagonals
-        for c in range(self._num_of_columns-3):
-            for r in range(3, self._num_of_rows):
-                if self._board[r][c] in [piece, 0] and self._board[r-1][c+1] in [piece, 0] and self._board[r-2][c+2] in [piece, 0] and self._board[r-3][c+3] in [piece, 0]:
-                    temp = sum([self._board[r][c], self._board[r-1][c+1], self._board[r-2][c+2], self._board[r-3][c+3]]) // piece
-                    score += temp if temp < 4 else 200
+        for r in range(self._num_of_rows):
+            for c in range(self._num_of_columns):
+                for dr, dc in self._directions:
+                    score += check_direction(r, c, dr, dc)
 
         return score
