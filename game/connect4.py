@@ -102,7 +102,7 @@ def main():
                         default=agents[0], type=str)
     player = ['keyboardPlayer', 'randomPlayer']
     parser.add_argument('--player', choices=player, help='the player against the agent.',
-                        default=player[1], type=str)
+                        default=player[0], type=str)
     parser.add_argument('--depth',
                         help='The maximum depth for to search in the game tree.',
                         default=2, type=int)

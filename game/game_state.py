@@ -4,19 +4,30 @@ ROWS = 6
 COLUMNS = 7
 PLAYER_ONE = 1
 PLAYER_TWO = 2
-
+BLOCK = 3
+OPEN = 0
 
 class Connect4GameState:
-    def __init__(self, rows=ROWS, columns=COLUMNS, board=None, done=False):
+    def __init__(self, rows=ROWS, columns=COLUMNS, board=None, done=False, numberOfBlocks = 5):
         self._done = done
         if board is None:
             board = np.zeros((rows, columns), dtype=np.int32)
         self._board = board
+        self._addBlocks(numberOfBlocks, rows, columns)
         self._num_of_rows, self._num_of_columns = rows, columns
         self._directions = [(0, 1),  # Horizontal
                             (1, 0),  # Vertical
                             (1, 1),  # Positive diagonal
                             (-1, 1)]  # Negative diagonal
+
+    def _addBlocks(self, num , rows, columns):
+        total_elements = rows * columns
+        grid_indices = np.arange(total_elements).reshape(rows, columns)
+        random_flat_indices = np.random.choice(total_elements, num, replace=False)
+        random_indices = np.unravel_index(random_flat_indices, (rows, columns))
+        random_indices_2d = list(zip(random_indices[0], random_indices[1]))
+        for x,y in random_indices_2d:
+            self._board[x][y] = BLOCK
 
     @property
     def done(self):
@@ -35,12 +46,15 @@ class Connect4GameState:
         for col in range(self._num_of_columns):
             if self.is_valid_location(col):
                 legal_action += [col]
-        # print(legal_action)
+        print(legal_action)
         return legal_action
 
     def is_valid_location(self, col):
         # print("bord", col,self._board[self._num_of_rows-1][col])
-        return self._board[self._num_of_rows - 1][col] == 0
+        for ind in range(self._num_of_rows):
+            if self._board[ind][col] == 0:
+                return True
+        return False
 
     def get_next_open_row(self, col):
         for r in range(self._num_of_rows):
@@ -59,26 +73,6 @@ class Connect4GameState:
             row = self.get_next_open_row(col)
             successor.drop_piece(row, col, 1 if agent_index == 0 else 2)
         return successor
-
-    def potential_row(self, player, first):
-        potenial = 0
-        for i in range(first[1], self._num_of_columns):
-            if self._board[first[0]][i] != 0 and self._board[first[0]][i] != player:
-                break
-            potenial += 1
-        for i in range(first[1] - 1, 0, -1):
-            if self._board[first[0]][i] != 0 and self._board[first[0]][i] != player:
-                break
-            potenial += 1
-        return potenial >= 4
-
-    def potential_cols(self, player, first):
-        potenial = 0
-        for i in range(first[0], self._num_of_rows):
-            if self._board[i][first[1]] != 0 and self._board[i][first[1]] != player:
-                break
-            potenial += 1
-        return potenial >= 4
 
 
     def winning_move(self, piece):
