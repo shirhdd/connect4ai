@@ -1,6 +1,8 @@
 import argparse
 import math
 import sys
+import time
+from datetime import datetime
 
 import numpy
 
@@ -12,9 +14,10 @@ from game_state import Connect4GameState, PLAYER_ONE, PLAYER_TWO
 
 class Connect4GameRunner:
     def __init__(self, rows, cols):
-        self.current_game = Connect4GameState(rows, cols)
+        self.current_game = None
 
     def run_game(self, args):
+        self.current_game = Connect4GameState(args.rows, args.columns)
         game_over = False
         turn = 0
         if args.agent == 'MonteCarloAgent':
@@ -24,13 +27,16 @@ class Connect4GameRunner:
         display = Display(args.rows, args.columns)
         display.draw_board(self.current_game.board)
         randomAgent = RandomAgent()
-
+        win = 0
+        steps = 0
+        begTime = datetime.now().time()
         while not game_over:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
                 action = -2
                 if turn == 1:
+                    steps += 1
                     action = agent.get_action(self.current_game)
                 elif args.player == "keyboardPlayer":
                     # Mouse hover
@@ -41,15 +47,16 @@ class Connect4GameRunner:
 
                     # Mouse click
                     if event.type == pygame.MOUSEBUTTONDOWN:
+                        steps += 1
                         print("score: ", self.current_game.get_all_four(1) - self.current_game.get_all_four(2))
                         posx = event.pos[0]
                         action = int(math.floor(posx / SQUARESIZE))
-                else:
+                elif args.player == "randomPlayer":
+                    steps += 1
                     action = randomAgent.get_action(self.current_game)
 
                 # Verify action is valid
-                if action != -2 and self.current_game.is_valid_location(
-                        action):
+                if action != -2 and self.current_game.is_valid_location(action):
                     display.draw_rect()
                     row = self.current_game.get_next_open_row(action)
                     self.current_game.drop_piece(row, action,
@@ -64,6 +71,7 @@ class Connect4GameRunner:
                         display.update_screen()  # Update the display to show the win message
                         print(
                             f"Player {turn + 1} wins!")  # Print the win message in the terminal
+                        win =  1 if turn == 1 else 0
                         game_over = True
                     if self.current_game.get_legal_actions() == []:
                         display.write_draw()
@@ -73,11 +81,13 @@ class Connect4GameRunner:
 
                     turn += 1
                     turn = turn % 2
-
                     if game_over:
                         pygame.time.wait(3000)
-                        sys.exit()
-
+                        endTime = datetime.now().time()
+                        begTime_dt = datetime.combine(datetime.today(), begTime)
+                        endTime_dt = datetime.combine(datetime.today(), endTime)
+                        time_difference = endTime_dt - begTime_dt
+                        return win, steps, time_difference
                 # Update the display to screen
                 display.update_screen()
 
@@ -103,7 +113,7 @@ def main():
                         default=100,
                         type=int)
     parser.add_argument('--num_of_games', help='The number of games to run.',
-                        default=1, type=int)
+                        default=2, type=int)
     parser.add_argument('--evaluation_function',
                         help='The evaluation function for ai agent.',
                         default='score_evaluation_function', type=str)
@@ -111,9 +121,15 @@ def main():
     print(args)
     numpy.random.seed(args.random_seed)
     game_runner = Connect4GameRunner(args.rows, args.columns)
+    winRate = 0
+    avgNumberOfsteps = 0
+    avgTime = 0
     for game in range(args.num_of_games):
-        game_runner.run_game(args)
+        (winner, steps, time) = game_runner.run_game(args)
+        winRate += winner
+        avgNumberOfsteps += steps
+        avgTime += int(time.total_seconds())
 
-
+    print(  "result", winRate / args.num_of_games, avgNumberOfsteps / args.num_of_games, avgTime / args.num_of_games)
 if __name__ == '__main__':
     main()
