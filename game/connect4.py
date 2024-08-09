@@ -81,7 +81,6 @@ class Connect4GameRunner:
                 # Update the display to screen
                 display.update_screen()
 
-
 def main():
     parser = argparse.ArgumentParser(description='Connect4 game.')
     parser.add_argument('--random_seed', help='The seed for the random state.',
