@@ -6,7 +6,7 @@ import numpy
 
 from display import Display, SQUARESIZE
 import pygame
-from multi_agents import AlphaBetaAgent, MonteCarloAgent
+from multi_agents import AlphaBetaAgent, MonteCarloAgent, RandomAgent
 from game_state import Connect4GameState, PLAYER_ONE, PLAYER_TWO
 
 
@@ -23,6 +23,7 @@ class Connect4GameRunner:
             agent = AlphaBetaAgent(args.evaluation_function, args.depth)
         display = Display(args.rows, args.columns)
         display.draw_board(self.current_game.board)
+        randomAgent = RandomAgent()
 
         while not game_over:
             for event in pygame.event.get():
@@ -31,7 +32,7 @@ class Connect4GameRunner:
                 action = -2
                 if turn == 1:
                     action = agent.get_action(self.current_game)
-                else:
+                elif args.player == "keyboardPlayer":
                     # Mouse hover
                     if event.type == pygame.MOUSEMOTION:
                         display.draw_rect()
@@ -43,6 +44,8 @@ class Connect4GameRunner:
                         print("score: ", self.current_game.get_all_four(1) - self.current_game.get_all_four(2))
                         posx = event.pos[0]
                         action = int(math.floor(posx / SQUARESIZE))
+                else:
+                    action = randomAgent.get_action(self.current_game)
 
                 # Verify action is valid
                 if action != -2 and self.current_game.is_valid_location(
@@ -65,8 +68,7 @@ class Connect4GameRunner:
                     if self.current_game.get_legal_actions() == []:
                         display.write_draw()
                         display.update_screen()  # Update the display to show the win message
-                        print(
-                            f"its a draw!")  # Print the win message in the terminal
+                        print(f"its a draw!")  # Print the win message in the terminal
                         game_over = True
 
                     turn += 1
@@ -74,6 +76,7 @@ class Connect4GameRunner:
 
                     if game_over:
                         pygame.time.wait(3000)
+                        sys.exit()
 
                 # Update the display to screen
                 display.update_screen()
@@ -88,6 +91,9 @@ def main():
     # parser.add_argument('--display', choices=displays, help='The game ui.', default=displays[0], type=str)
     parser.add_argument('--agent', choices=agents, help='The agent.',
                         default=agents[0], type=str)
+    player = ['keyboardPlayer', 'randomPlayer']
+    parser.add_argument('--player', choices=player, help='the player against the agent.',
+                        default=player[1], type=str)
     parser.add_argument('--depth',
                         help='The maximum depth for to search in the game tree.',
                         default=2, type=int)
@@ -104,6 +110,7 @@ def main():
                         default='score_evaluation_function', type=str)
     args = parser.parse_args()
     print(args)
+    numpy.random.seed(args.random_seed)
     game_runner = Connect4GameRunner(args.rows, args.columns)
     for game in range(args.num_of_games):
         game_runner.run_game(args)
