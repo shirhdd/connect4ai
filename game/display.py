@@ -1,5 +1,5 @@
 import pygame
-from game_state import PLAYER_ONE, PLAYER_TWO
+from game_state import PLAYER_ONE, PLAYER_TWO, BLOCKED
 
 SQUARESIZE = 100
 RADIUS = int(SQUARESIZE / 2 - 5)
@@ -47,6 +47,11 @@ class Display:
                 elif board[r][c] == PLAYER_TWO:
                     self.screen.blit(self.yellow_piece, (
                         c * SQUARESIZE, self.height - (r + 1) * SQUARESIZE))
+                elif board[r][c] == BLOCKED:
+                    pygame.draw.circle(self.screen, BLUE, (
+                        int(c * SQUARESIZE + SQUARESIZE / 2),
+                        int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)),
+                                       RADIUS)
         pygame.display.update()
 
     # TODO : change name to purpose (cover top?)
