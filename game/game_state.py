@@ -7,27 +7,28 @@ PLAYER_TWO = 2
 BLOCK = 3
 OPEN = 0
 
+
 class Connect4GameState:
-    def __init__(self, rows=ROWS, columns=COLUMNS, board=None, done=False, numberOfBlocks = 5):
+    def __init__(self, rows=ROWS, columns=COLUMNS, board=None, done=False, numberOfBlocks=5):
         self._done = done
         if board is None:
             board = np.zeros((rows, columns), dtype=np.int32)
+            self._addBlocks(board, numberOfBlocks, rows, columns)
         self._board = board
-        self._addBlocks(numberOfBlocks, rows, columns)
         self._num_of_rows, self._num_of_columns = rows, columns
         self._directions = [(0, 1),  # Horizontal
                             (1, 0),  # Vertical
                             (1, 1),  # Positive diagonal
                             (-1, 1)]  # Negative diagonal
 
-    def _addBlocks(self, num , rows, columns):
+    def _addBlocks(self, board, num, rows, columns):
         total_elements = rows * columns
         grid_indices = np.arange(total_elements).reshape(rows, columns)
         random_flat_indices = np.random.choice(total_elements, num, replace=False)
         random_indices = np.unravel_index(random_flat_indices, (rows, columns))
         random_indices_2d = list(zip(random_indices[0], random_indices[1]))
-        for x,y in random_indices_2d:
-            self._board[x][y] = BLOCK
+        for x, y in random_indices_2d:
+            board[x][y] = BLOCK
 
     @property
     def done(self):
@@ -46,7 +47,6 @@ class Connect4GameState:
         for col in range(self._num_of_columns):
             if self.is_valid_location(col):
                 legal_action += [col]
-        print(legal_action)
         return legal_action
 
     def is_valid_location(self, col):
@@ -73,7 +73,6 @@ class Connect4GameState:
             row = self.get_next_open_row(col)
             successor.drop_piece(row, col, 1 if agent_index == 0 else 2)
         return successor
-
 
     def winning_move(self, piece):
         def check_line(line):
@@ -102,8 +101,13 @@ class Connect4GameState:
 
     def get_all_four(self, piece):
         def check_line(line):
-            temp = sum(line) // piece
-            return temp if temp < 4 else 200
+            count = 0
+            for pos in line:
+                if pos == piece:
+                    count += 1
+            if count == 4:
+                return 200
+            return count if count < 4 else 200
 
         def is_valid_cell(r, c):
             return 0 <= r < self._num_of_rows and 0 <= c < self._num_of_columns and self._board[r][c] in [piece, 0]
@@ -124,5 +128,4 @@ class Connect4GameState:
             for c in range(self._num_of_columns):
                 for dr, dc in self._directions:
                     score += check_direction(r, c, dr, dc)
-
         return score
