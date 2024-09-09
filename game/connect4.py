@@ -1,3 +1,15 @@
+"""
+###################################################################################################
+# Connect4 Game Runner for Connect 4 AI Project                                                   #
+#                                                                                                 #
+# This module serves as the core controller for running the Connect 4 game. It allows the user    #
+# to configure the game through command-line arguments, manage the main game loop, and interact   #
+# with the AI agents and player inputs. The game can be played using various agents, including    #
+# AlphaBetaAgent and MonteCarloAgent, or against a human player through keyboard input or a       #
+# random player.                                                                                  #
+###################################################################################################
+"""
+
 import argparse
 import math
 import sys
@@ -13,10 +25,17 @@ from game_state import Connect4GameState, PLAYER_ONE, PLAYER_TWO
 
 
 class Connect4GameRunner:
+    """
+    Handles the game state and manages interactions between the game board, AI agents, and user inputs.
+    """
+
     def __init__(self, rows, cols):
         self.current_game = None
 
     def run_game(self, args):
+        """
+        Executes the game loop, manages player/AI moves, and checks for game-ending conditions.
+        """
         self.current_game = Connect4GameState(args.rows, args.columns)
         game_over = False
         turn = 0
@@ -41,9 +60,9 @@ class Connect4GameRunner:
                         sys.exit()
 
                     if event.type == pygame.MOUSEMOTION:
-                        display.draw_rect()
+                        display.cover_top()
                         posx = event.pos[0]
-                        display.draw_circle(turn, posx)
+                        display.draw_piece(turn, posx)
 
                         # Mouse click
                     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -54,12 +73,11 @@ class Connect4GameRunner:
 
             if action != -1:
                 steps += 1
-                display.draw_rect()
+                display.cover_top()
                 row = self.current_game.get_next_open_row(action)
                 self.current_game.drop_piece(row, action,
                                              PLAYER_ONE if turn == 0 else PLAYER_TWO)
                 display.draw_board(self.current_game.board)
-
 
                 # check if move is a winning move
                 if self.current_game.winning_move(
@@ -80,7 +98,22 @@ class Connect4GameRunner:
             # Update the display to screen
             display.update_screen()
 
+
 def main():
+    """
+    Parses command-line arguments, initializes the game, and runs the game loop.
+
+    Command-Line Arguments:
+        - --random_seed: Sets a seed for reproducibility in random moves.
+        - --agent: Specifies the AI agent to play against (AlphaBetaAgent or MonteCarloAgent).
+        - --player: Defines the type of player (keyboard input or random moves).
+        - --depth: Sets the maximum depth for the AlphaBetaAgent search tree.
+        - --rows: Number of rows on the game board (default is 6).
+        - --columns: Number of columns on the game board (default is 7).
+        - --simulations: Number of simulations for the MonteCarloAgent (default is 100).
+        - --num_of_games: Number of games to run in a single session.
+        - --evaluation_function: Defines the evaluation function used by the AlphaBetaAgent.
+    """
     parser = argparse.ArgumentParser(description='Connect4 game.')
     parser.add_argument('--random_seed', help='The seed for the random state.',
                         default=numpy.random.randint(100), type=int)
@@ -111,7 +144,6 @@ def main():
     game_runner = Connect4GameRunner(args.rows, args.columns)
     for game in range(args.num_of_games):
         game_runner.run_game(args)
-
 
 
 if __name__ == '__main__':

@@ -1,8 +1,19 @@
+"""
+#########################################################################################
+# Display Module for Connect 4 AI Project                                               #
+#                                                                                       #
+# This module is responsible for rendering the game board, updating the visual          #
+# elements during the game, and managing the graphical interface using Pygame. It       #
+# includes methods for drawing the game board, placing pieces, displaying the winner,   #
+# and updating the screen in real-time.                                                 #
+#########################################################################################
+"""
+
 import pygame
 from game_state import PLAYER_ONE, PLAYER_TWO, BLOCK
 
-SQUARESIZE = 100
-RADIUS = int(SQUARESIZE / 2 - 5)
+SQUARESIZE = 100  # Size of each square in the Connect 4 grid.
+RADIUS = int(SQUARESIZE / 2 - 5)  # Radius of the circles drawn on the grid representing empty spaces.
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -12,6 +23,10 @@ YELLOW_IMG = r'.\images\yellow_70x70.png'
 
 
 class Display:
+    """
+    Manages all graphical aspects of the game, such as drawing the board, pieces, and updating the game window.
+    """
+
     def __init__(self, rows, cols):
         self.rows = rows
         self.cols = cols
@@ -29,7 +44,10 @@ class Display:
                                                    (SQUARESIZE, SQUARESIZE))
 
     def draw_board(self, board):
-
+        """
+        Draws the given board on the screen and calls the update screen function.
+        This function should be called every time the game display should change.
+        """
         for c in range(self.cols):
             for r in range(self.rows):
                 pygame.draw.rect(self.screen, BLUE, (
@@ -54,23 +72,36 @@ class Display:
                                        RADIUS)
         pygame.display.update()
 
-    # TODO : change name to purpose (cover top?)
-    def draw_rect(self):
+    def cover_top(self):
+        """
+        Covers the top area of the game display where the player's next piece is shown before placement.
+        """
         pygame.draw.rect(self.screen, BLACK, (0, 0, self.width, SQUARESIZE))
 
-    # TODO : change name to purpose
-    def draw_circle(self, turn, posx):
+    def draw_piece(self, turn, posx):
+        """
+        Draws a piece for the current player at the specified horizontal position.
+        """
         image = self.red_piece if turn == 0 else self.yellow_piece
         self.screen.blit(image, (posx - SQUARESIZE // 2, 0))
 
     def write_winner_to_screen(self, turn):
+        """
+        Displays a message declaring the winner based on the current player's turn.
+        """
         label = self.myfont.render(f"Player {turn + 1} wins!!", 1,
                                    RED if turn == 0 else YELLOW)
         self.screen.blit(label, (40, 10))
 
     def write_draw(self):
+        """
+        Displays a message indicating the game ended in a draw.
+        """
         label = self.myfont.render(f"its a draw...", 1, BLACK)
         self.screen.blit(label, (40, 10))
 
     def update_screen(self):
+        """
+        Updates the Pygame display window with the latest changes.
+        """
         pygame.display.update()
