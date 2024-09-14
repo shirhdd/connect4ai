@@ -10,7 +10,7 @@
 """
 
 import pygame
-from game_state import PLAYER_ONE, PLAYER_TWO, BLOCK
+from game.game_state import PLAYER_ONE, PLAYER_TWO, BLOCK
 
 SQUARESIZE = 100  # Size of each square in the Connect 4 grid.
 RADIUS = int(SQUARESIZE / 2 - 5)  # Radius of the circles drawn on the grid representing empty spaces.
