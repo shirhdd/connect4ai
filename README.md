@@ -2,12 +2,6 @@
 
 This project is a command-line Connect4 game that allows users to play against an AI agent. The AI agent can either be the **AlphaBetaAgent** or the **MonteCarloAgent**. Various gameplay options such as the number of rows, columns, and depth for the search tree can be configured using command-line arguments.
 
-## Requirements
-
-- Python 3.x
-- `argparse`
-- `numpy`
-
 ## Setup
 
 1. Clone the repository:
@@ -41,7 +35,6 @@ python connect4.py [options]
 | `--columns`            | Number of columns on the game board.                                                      | `7`                          |
 | `--simulations`        | Number of simulations for the MonteCarloAgent.                                            | `100`                        |
 | `--num_of_games`       | Number of games to run in a single session.                                               | `1`                          |
-| `--evaluation_function`| Specifies the evaluation function used by the AlphaBetaAgent.                             | `score_evaluation_function`  |
 
 ### Examples
 
@@ -50,14 +43,14 @@ python connect4.py [options]
    python connect4.py
    ```
 
-2. **Play with the AlphaBetaAgent and increase the search depth to 4**:
+2. **Play with the AlphaBetaAgent and increase the search depth to 3**:
    ```bash
-   python connect4.py --agent AlphaBetaAgent --depth 4
+   python connect4.py --agent AlphaBetaAgent --depth 3
    ```
 
-3. **Play using the MonteCarloAgent with 200 simulations**:
+3. **Play using the MonteCarloAgent with 150 simulations**:
    ```bash
-   python connect4.py --agent MonteCarloAgent --simulations 200
+   python connect4.py --agent MonteCarloAgent --simulations 150
    ```
 
 4. **Run 5 games with a random player**:
