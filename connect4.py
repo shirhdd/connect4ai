@@ -18,10 +18,10 @@ from datetime import datetime
 
 import numpy
 
-from display import Display, SQUARESIZE
+from game.display import Display, SQUARESIZE
 import pygame
-from multi_agents import AlphaBetaAgent, MonteCarloAgent, RandomAgent
-from game_state import Connect4GameState, PLAYER_ONE, PLAYER_TWO
+from game.multi_agents import AlphaBetaAgent, MonteCarloAgent, RandomAgent
+from game.game_state import Connect4GameState, PLAYER_ONE, PLAYER_TWO
 
 
 class Connect4GameRunner:

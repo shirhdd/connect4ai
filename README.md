@@ -12,13 +12,13 @@ This project is a command-line Connect4 game that allows users to play against a
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/connect4-game.git
-   cd connect4-game
+   git clone https://github.com/shirhdd/connect4ai.git
+   cd connect4ai
    ```
 
 2. Install the required dependencies:
    ```bash
-   pip install numpy
+   pip install -r requirements.txt
    ```
 
 ## How to Run
